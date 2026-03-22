@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this filter, please cite it."
+authors:
+  - family-names: "Barrio"
+    given-names: "Pedro Luis"
+title: "alerts-normalize.lua"
+version: 0.1.0
+date-released: 2026-03-22
+url: "https://github.com/plbarrio/alerts-normalize"
+license: GPL-3.0-or-later
+abstract: >
+  Pandoc Lua filter that converts GitHub alert blockquote syntax to classed
+  Divs compatible with plain Pandoc and container-writer, or to native
+  callout-* Divs when running inside Quarto.
+keywords:
+  - pandoc
+  - lua-filter
+  - quarto
+  - markdown
+  - publishing

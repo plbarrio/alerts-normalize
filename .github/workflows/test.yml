@@ -1,0 +1,52 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-3_1_3:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pandoc/actions/setup@v1
+        with:
+          version: 3.1.3
+
+      - name: Run alerts-normalize tests (Pandoc)
+        run: make test-pandoc
+
+      - name: Run alerts-normalize tests (Quarto format)
+        run: make test-quarto
+
+  test-latest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pandoc/actions/setup@v1
+
+      - name: Run alerts-normalize tests (Pandoc)
+        run: make test-pandoc
+
+      - name: Run alerts-normalize tests (Quarto format)
+        run: make test-quarto
+
+  test-quarto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install LaTeX packages
+        run: sudo apt-get install -y texlive-fonts-extra texlive-luatex context
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Run alerts-normalize tests (Quarto + pandoc-format)
+        run: make test-quarto-pandoc
+
+      - name: Run alerts-normalize example (all formats)
+        run: cd examples && make all

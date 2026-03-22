@@ -1,0 +1,1 @@
+_extensions/alerts-normalize/alerts-normalize.lua
