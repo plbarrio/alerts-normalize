@@ -2,7 +2,7 @@
 #
 # Targets:
 #   test                  — run all tests
-#   test-pandoc           — plain Pandoc path (11 cases)
+#   test-pandoc           — plain Pandoc path (12 cases)
 #   test-quarto           — forced Quarto path via out-format: quarto-format (6 cases)
 #   test-quarto-pandoc    — Quarto runner + out-format: pandoc-format (5 cases, requires quarto)
 #   test-roundtrip        — round-trip through all readable formats via pandoc-md
@@ -12,6 +12,7 @@ INPUT_DIR     = test/input
 EXPECTED      = test/expected
 META_PANDOC   = $(INPUT_DIR)/alert-normalize-pandoc-mode.yaml
 META_QUARTO   = $(INPUT_DIR)/alert-normalize-quarto-mode.yaml
+META_TYPE_MAP = $(INPUT_DIR)/alert-normalize-type-map.yaml
 
 # strips pandoc-api-version from JSON output before comparing
 STRIP_VER = python3 -c "import sys,json; d=json.load(sys.stdin); d.pop('pandoc-api-version',None); d.pop('meta',None); print(json.dumps(d))"
@@ -24,7 +25,7 @@ STEP = pandoc -f markdown -t markdown --lua-filter=$(FILTER) --metadata alerts-n
         test-pandoc-rich test-pandoc-passthrough \
         test-pandoc-title test-pandoc-collapse test-pandoc-title-only \
         test-pandoc-custom-type test-pandoc-pandoc-md-source \
-        test-pandoc-quarto-titled \
+        test-pandoc-quarto-titled test-pandoc-type-map \
         test-quarto-basic test-quarto-empty test-quarto-multipara \
         test-quarto-rich test-quarto-passthrough test-quarto-titled \
         test-quarto-pandoc-basic test-quarto-pandoc-empty \
@@ -43,7 +44,7 @@ test-pandoc: test-pandoc-basic test-pandoc-empty test-pandoc-multipara \
              test-pandoc-rich test-pandoc-passthrough \
              test-pandoc-title test-pandoc-collapse test-pandoc-title-only \
              test-pandoc-custom-type test-pandoc-pandoc-md-source \
-             test-pandoc-quarto-titled
+             test-pandoc-quarto-titled test-pandoc-type-map
 
 test-pandoc-basic:
 	@echo -n "test-pandoc-basic: "
@@ -120,6 +121,13 @@ test-pandoc-quarto-titled:
 	@pandoc $(INPUT_DIR)/alert-normalize-quarto-titled.md \
 	  --lua-filter=$(FILTER) -t json \
 	| $(STRIP_VER) | diff - $(EXPECTED)/alert-normalize-quarto-titled-pandoc.json
+	@echo "OK"
+
+test-pandoc-type-map:
+	@echo -n "test-pandoc-type-map: "
+	@pandoc $(INPUT_DIR)/alert-normalize-type-map.md \
+	  --lua-filter=$(FILTER) --metadata-file=$(META_TYPE_MAP) -t json \
+	| $(STRIP_VER) | diff - $(EXPECTED)/alert-normalize-type-map-pandoc.json
 	@echo "OK"
 
 # --- Quarto forced via out-format: quarto-format ---
@@ -307,6 +315,10 @@ generate-pandoc:
 	  pandoc $(INPUT_DIR)/$$f.md --lua-filter=$(FILTER) -t json \
 	  | $(STRIP_VER) > $(EXPECTED)/$$f-pandoc.json && echo "OK"; \
 	done
+	@echo -n "  alert-normalize-type-map: "
+	@pandoc $(INPUT_DIR)/alert-normalize-type-map.md --lua-filter=$(FILTER) \
+	  --metadata-file=$(META_TYPE_MAP) -t json \
+	| $(STRIP_VER) > $(EXPECTED)/alert-normalize-type-map-pandoc.json && echo "OK"
 
 generate-quarto:
 	@echo "Generating quarto expected files..."

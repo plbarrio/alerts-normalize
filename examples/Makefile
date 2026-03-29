@@ -7,11 +7,9 @@ QOUTDIR       = output/quarto
 # Target lists (Filenames only)
 HTMLS        = $(INPUTS:.md=.html)
 EPUBS        = $(INPUTS:.md=.epub)
-PDFS_LATEX   = $(INPUTS:.md=-latex.pdf)
-PDFS_TYPST   = $(INPUTS:.md=-typst.pdf)
 
 .PHONY: all pandoc quarto html epub \
-        pdf-latex-quarto pdf-typst-quarto html-quarto epub-quarto \
+        pdf-latex-quarto pdf-typst-quarto \
         clean
 
 all: pandoc quarto
@@ -19,18 +17,9 @@ all: pandoc quarto
 # --- Grouped targets ---------------------------------------
 pandoc: html epub
 
-quarto: html-quarto epub-quarto
-	-$(MAKE) pdf-latex-quarto
-	-$(MAKE) pdf-typst-quarto
-
 # --- Target mapping -----------
-html:              $(addprefix $(OUTDIR)/,$(HTMLS))
-epub:              $(addprefix $(OUTDIR)/,$(EPUBS))
-
-html-quarto:       $(addprefix $(QOUTDIR)/,$(HTMLS))
-epub-quarto:       $(addprefix $(QOUTDIR)/,$(EPUBS))
-pdf-latex-quarto:  $(addprefix $(QOUTDIR)/,$(PDFS_LATEX))
-pdf-typst-quarto:  $(addprefix $(QOUTDIR)/,$(PDFS_TYPST))
+html:  $(addprefix $(OUTDIR)/,$(HTMLS))
+epub:  $(addprefix $(OUTDIR)/,$(EPUBS))
 
 $(OUTDIR) $(QOUTDIR):
 	mkdir -p $@
@@ -43,18 +32,17 @@ $(OUTDIR)/%.epub: %.md | $(OUTDIR)
 	-pandoc $(FILTERS) --css=./demo.css -o $@ $<
 
 # --- Quarto rules  ------------
-$(QOUTDIR)/%-latex.pdf: %.md | $(QOUTDIR)
-	-quarto render $< --to pdf --pdf-engine=lualatex --output-dir=$(QOUTDIR) --output $(notdir $@)
+quarto: | $(QOUTDIR)
+	-quarto render demo.md --to html
+	-quarto render demo.md --to epub
+	-$(MAKE) pdf-latex-quarto
+	-$(MAKE) pdf-typst-quarto
 
-$(QOUTDIR)/%-typst.pdf: %.md | $(QOUTDIR)
-	-quarto render $< --to typst --output-dir=$(QOUTDIR) --output $(notdir $@)
+pdf-latex-quarto: | $(QOUTDIR)
+	-quarto render demo.md --to pdf --pdf-engine=lualatex --output demo-latex.pdf
 
-$(QOUTDIR)/%.html: %.md | $(QOUTDIR)
-	-quarto render $< --to html --output-dir=$(QOUTDIR)
-
-$(QOUTDIR)/%.epub: %.md | $(QOUTDIR)
-	-quarto render $< --to epub --output-dir=$(QOUTDIR)
+pdf-typst-quarto: | $(QOUTDIR)
+	-quarto render demo.md --to typst --output demo-typst.pdf
 
 clean:
 	rm -rf output
-

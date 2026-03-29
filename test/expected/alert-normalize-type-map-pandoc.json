@@ -1,0 +1,1 @@
+{"blocks": [{"t": "Div", "c": [["", ["note"], []], [{"t": "Para", "c": [{"t": "Str", "c": "Mapped"}, {"t": "Space"}, {"t": "Str", "c": "to"}, {"t": "Space"}, {"t": "Str", "c": "note."}]}]]}, {"t": "Div", "c": [["", ["tip"], []], [{"t": "Para", "c": [{"t": "Str", "c": "Mapped"}, {"t": "Space"}, {"t": "Str", "c": "to"}, {"t": "Space"}, {"t": "Str", "c": "tip."}]}]]}]}

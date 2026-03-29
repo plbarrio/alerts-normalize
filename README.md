@@ -149,6 +149,9 @@ Quarto callout — no title needed.
 
 ## Configuration
 
+
+### Simple form
+
 The simplest form works on the command line and in frontmatter:
 
 ```sh
@@ -163,6 +166,8 @@ alerts-normalize: github-format
 ---
 ```
 
+### Nested form (custom types, remapping)
+
 For additional options, use the nested form in a metadata file or frontmatter:
 
 ```yaml
@@ -170,23 +175,14 @@ alerts-normalize:
   out-format: pandoc-format
   custom-types:
     - spoiler
-    - exercise
-    - theorem
+    - exercise 
+    - info : note # remap info -> note
 ```
 
-### `out-format`
+* `out-format` — chooses the output format. Auto-detected when omitted: `quarto-format` inside Quarto, `pandoc-format` otherwise.
 
-Selects the output format. Auto-detected when omitted: `quarto-format` inside
-`quarto render`, `pandoc-format` otherwise.
+* `custom-types` — extends the built-in callout whitelist; supports **remapping** (`source: target`) and new types.
 
-### `custom-types`
-
-Extends the built-in callout type whitelist with additional types. The built-in
-list covers the core types (`note`, `warning`, `tip`, `caution`, `important`)
-and extended types from Obsidian, MkDocs, MyST, Sphinx, and VitePress ecosystems.
-
-Custom types from GitHub syntax (`> [!WORD]`) are always accepted regardless
-of the whitelist — the whitelist only applies to plain classed div detection.
 
 ## Output
 
@@ -241,7 +237,7 @@ Content.
 - Inline title capture: `> [!NOTE] My title`
 - Collapse support: `[!NOTE]-` collapsed, `[!NOTE]+` expanded
 - Extended callout type whitelist — 25 built-in types
-- Custom types via `custom-types` frontmatter option
+- Custom types via `custom-types` frontmatter option, with remapping
 - `pandoc-md` intermediate format for round-trip pipelines
 - No silent failures — unrecognised markers pass through unchanged
 

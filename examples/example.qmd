@@ -1,0 +1,15 @@
+---
+title: alerts-normalize.lua — full demo
+
+format:
+  html: default
+  pdf: default
+  docx: default
+filters:
+  - at: pre-ast
+    path: ../alerts-normalize.lua
+
+project:
+  output-dir: output/quarto
+---
+{{< include demo.md >}}

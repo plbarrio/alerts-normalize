@@ -1,5 +1,20 @@
 ---
 title: alerts-normalize.lua — full demo
+
+alerts-normalize:
+  custom-types:
+    - info     : note
+    - success
+    - failure
+    - danger   : warning
+    - bug
+    - example
+    - quote
+    - abstract : important
+    - hint
+    - todo
+    - seealso 
+    - spoiler
 ---
 
 ## Standard GitHub alert types
@@ -32,9 +47,9 @@ title: alerts-normalize.lua — full demo
 > All uppercase.
 
 
-## Extended types
+## Extended/remap types 
 
-> [!INFO]
+> [!INFO] Info
 > Additional information.
 
 > [!SUCCESS]
@@ -43,7 +58,7 @@ title: alerts-normalize.lua — full demo
 > [!FAILURE]
 > Something went wrong.
 
-> [!DANGER]
+> [!DANGER] Danger
 > Danger zone.
 
 > [!BUG]
@@ -55,7 +70,7 @@ title: alerts-normalize.lua — full demo
 > [!QUOTE]
 > A relevant quotation.
 
-> [!ABSTRACT]
+> [!ABSTRACT] Abstract
 > Summary of the content.
 
 > [!HINT]

@@ -11,6 +11,8 @@ all supported input formats, output formats, and syntax variants.
   Pandoc 3.9, Quarto).
 - **`demo.css`**: GitHub Primer styles with Octicons (MIT License) embedded as
   Data URIs — generates self-contained, portable HTML.
+- **`example.qmd`**: Quarto entry point for the extension gallery — wraps `demo.md`.
+
 - **`Makefile`**: Build targets for all output formats.
 - **`_quarto.yml`**: Quarto project config declaring the filter at `pre-ast`.
 
@@ -19,7 +21,7 @@ all supported input formats, output formats, and syntax variants.
 ### Pandoc (lightweight)
 
 ```sh
-make html
+make pandoc
 ```
 
 Renders `demo.md` via Pandoc with `demo.css`. Fast, no Quarto required.
@@ -27,11 +29,17 @@ Renders `demo.md` via Pandoc with `demo.css`. Fast, no Quarto required.
 ### Quarto (native callouts)
 
 ```sh
-make html-quarto
+make quarto
 ```
 
 Renders via `quarto render` — produces native styled callout boxes with icons,
 colours, and collapse behaviour.
+
+Altenatively you can just
+
+```sh
+quarto render example.qmd
+```
 
 ### All formats
 

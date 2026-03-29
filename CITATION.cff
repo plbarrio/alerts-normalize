@@ -4,7 +4,7 @@ authors:
   - family-names: "Barrio"
     given-names: "Pedro Luis"
 title: "alerts-normalize.lua"
-version: 1.0.0
+version: 1.1.0
 date-released: 2026-03-22
 url: "https://github.com/plbarrio/alerts-normalize"
 license: GPL-3.0-or-later

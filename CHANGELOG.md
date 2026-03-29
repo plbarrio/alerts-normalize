@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.1.0] — 2026-03-29
+
+### Added
+
+- **Custom type remapping**: allow mapping one callout type to another via frontmatter, e.g.:
+
+```yaml
+alerts-normalize:
+  out-format: pandoc-format
+  custom-types:
+    - info: note
+```
+
+This remaps info alerts to note during normalization.
+
 ## \[1.0.0]
 
 ### Architecture

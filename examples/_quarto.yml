@@ -1,3 +1,6 @@
 filters:
   - at: pre-ast
     path: ../alerts-normalize.lua
+
+project:
+  output-dir: output/quarto

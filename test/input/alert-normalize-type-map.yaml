@@ -1,0 +1,5 @@
+alerts-normalize:
+  out-format: pandoc-format
+  custom-types:
+    - info: note
+    - hint: tip

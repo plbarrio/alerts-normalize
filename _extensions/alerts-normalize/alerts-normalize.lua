@@ -26,6 +26,7 @@ Per-document options (in frontmatter):
     custom-types:
       - spoiler
       - exercise
+      - info: note       # mapping: info renders as note
 
 See copyright notice in file LICENSE.
 ]]
@@ -231,6 +232,8 @@ end
 
 -- # Normalizers
 
+local TypeMap = {}  -- optional kind remapping, e.g. info -> note
+
 --- Known callout types for Pandoc/Sphinx plain div detection.
 local CalloutTypes = {
   -- core (all formats)
@@ -247,6 +250,7 @@ local CalloutTypes = {
 }
 
 local function make_div(kind, blocks, title, collapse)
+  kind = TypeMap[kind] or kind
   local attrs = {}
   if title and title ~= '' then attrs.title = title end
   if collapse == true  then attrs.collapse = 'true'  end
@@ -347,13 +351,23 @@ local function process_metadata(meta)
     --   out-format: pandoc-format
     --   custom-types:
     --     - spoiler
+    --     - info: note
     local fmt = cfg['out-format']
     out_format = fmt and pandoc.utils.stringify(fmt)
                       or (quarto ~= nil and 'quarto-format' or 'pandoc-format')
     local types = cfg['custom-types']
     if types then
       for _, v in ipairs(types) do
-        CalloutTypes[pandoc.utils.stringify(v)] = true
+        if type(v) == 'table' then
+          -- mapping form: { info: note }
+          for src, dst in pairs(v) do
+            CalloutTypes[src] = true
+            TypeMap[src] = pandoc.utils.stringify(dst)
+          end
+        else
+          -- plain string: spoiler
+          CalloutTypes[pandoc.utils.stringify(v)] = true
+        end
       end
     end
   end
