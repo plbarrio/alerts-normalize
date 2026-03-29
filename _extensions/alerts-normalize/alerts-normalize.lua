@@ -81,10 +81,26 @@ local FormatDefaults = {
 }
 
 
--- # State
+-- # Options
 
-local out_format
-local write_rules
+local Options = {
+  format   = 'pandoc-format',
+  rules    = nil,
+  type_map = {},
+  types    = {
+    -- core (all formats)
+    note=true, warning=true, tip=true, caution=true, important=true,
+    -- extended (obsidian, mkdocs, admonition ecosystems)
+    info=true, success=true, question=true, failure=true, danger=true,
+    bug=true, example=true, quote=true, abstract=true, hint=true,
+    check=true, done=true, error=true, help=true, faq=true,
+    attention=true,
+    -- sphinx/myst
+    seealso=true, todo=true,
+    -- vitepress
+    details=true,
+  },
+}
 
 
 -- # Helpers
@@ -94,9 +110,9 @@ local function get_type(div)
 end
 
 local function format_type(type_str)
-  if write_rules.TypeCase == TypeCase.lower then
+  if Options.rules.TypeCase == TypeCase.lower then
     return type_str:lower()
-  elseif write_rules.TypeCase == TypeCase.upper then
+  elseif Options.rules.TypeCase == TypeCase.upper then
     return type_str:upper()
   else
     return type_str
@@ -115,13 +131,13 @@ end
 local function write_div(div)
   local kind  = format_type(get_type(div))
   local title = div.attributes.title  -- nil if absent, '' if explicitly empty
-  if out_format == 'pandoc-md' then
+  if Options.format == 'pandoc-md' then
     -- intermediate: class only, preserve title attribute as-is
     div.classes = { kind }
     return div
-  elseif write_rules.Prefix then
+  elseif Options.rules.Prefix then
     -- Quarto: omit title attribute if nil, Quarto auto-generates from class
-    div.classes = { write_rules.Prefix .. kind }
+    div.classes = { Options.rules.Prefix .. kind }
     if title and title ~= '' then
       div.attributes.title = title
     else
@@ -146,7 +162,7 @@ local function write_blockquote(div)
   local kind     = format_type(get_type(div))
   local title    = div.attributes.title
   local collapse = div.attributes.collapse
-  local suffix   = write_rules.Collapse
+  local suffix   = Options.rules.Collapse
     and (collapse == 'true' and '-' or collapse == 'false' and '+' or '')
     or ''
   -- marker as RawInline to prevent Pandoc from escaping the brackets
@@ -166,8 +182,8 @@ end
 
 local function write_fence(div)
   local kind     = format_type(get_type(div))
-  local title    = write_rules.HasTitle and (div.attributes.title or '') or ''
-  local collapse = write_rules.Collapse and div.attributes.collapse == 'true'
+  local title    = Options.rules.HasTitle and (div.attributes.title or '') or ''
+  local collapse = Options.rules.Collapse and div.attributes.collapse == 'true'
   local cls      = collapse and 'dropdown' or kind
   local open     = pandoc.RawBlock('markdown', '```{' .. cls .. '} ' .. title)
   local close    = pandoc.RawBlock('markdown', '```')
@@ -176,8 +192,8 @@ end
 
 local function write_admonition(div)
   local kind     = format_type(get_type(div))
-  local title    = write_rules.HasTitle and (' "' .. (div.attributes.title or '') .. '"') or ''
-  local collapse = write_rules.Collapse and div.attributes.collapse == 'true'
+  local title    = Options.rules.HasTitle and (' "' .. (div.attributes.title or '') .. '"') or ''
+  local collapse = Options.rules.Collapse and div.attributes.collapse == 'true'
   local marker   = collapse and '???' or '!!!'
   local open     = pandoc.RawBlock('markdown', marker .. ' ' .. kind .. title)
   return { open, indent_content(div.content) }
@@ -185,7 +201,7 @@ end
 
 local function write_directive(div)
   local kind  = format_type(get_type(div))
-  local title = write_rules.HasTitle and (div.attributes.title or '') or ''
+  local title = Options.rules.HasTitle and (div.attributes.title or '') or ''
   local open  = pandoc.RawBlock('rst', '.. ' .. kind .. ':: ' .. title)
   return { open, indent_content(div.content) }
 end
@@ -199,8 +215,8 @@ end
 
 local function write_colon(div)
   local kind     = format_type(get_type(div))
-  local title    = write_rules.HasTitle and (div.attributes.title or '') or ''
-  local collapse = write_rules.Collapse and div.attributes.collapse == 'true'
+  local title    = Options.rules.HasTitle and (div.attributes.title or '') or ''
+  local collapse = Options.rules.Collapse and div.attributes.collapse == 'true'
   local open     = collapse
     and pandoc.RawBlock('markdown', ':::details ' .. title)
     or  pandoc.RawBlock('markdown', ':::' .. kind .. ' ' .. title)
@@ -222,9 +238,9 @@ local Writers = {
 }
 
 local function write_callout(div)
-  local writer = Writers[write_rules.Container]
+  local writer = Writers[Options.rules.Container]
   if not writer then
-    error('No writer for container: ' .. tostring(write_rules.Container), 2)
+    error('No writer for container: ' .. tostring(Options.rules.Container), 2)
   end
   return writer(div)
 end
@@ -232,25 +248,8 @@ end
 
 -- # Normalizers
 
-local TypeMap = {}  -- optional kind remapping, e.g. info -> note
-
---- Known callout types for Pandoc/Sphinx plain div detection.
-local CalloutTypes = {
-  -- core (all formats)
-  note=true, warning=true, tip=true, caution=true, important=true,
-  -- extended (obsidian, mkdocs, admonition ecosystems)
-  info=true, success=true, question=true, failure=true, danger=true,
-  bug=true, example=true, quote=true, abstract=true, hint=true,
-  check=true, done=true, error=true, help=true, faq=true,
-  attention=true,
-  -- sphinx/myst
-  seealso=true, todo=true,
-  -- vitepress
-  details=true,
-}
-
 local function make_div(kind, blocks, title, collapse)
-  kind = TypeMap[kind] or kind
+  kind = Options.type_map[kind] or kind
   local attrs = {}
   if title and title ~= '' then attrs.title = title end
   if collapse == true  then attrs.collapse = 'true'  end
@@ -261,7 +260,7 @@ end
 --- GitHub / Obsidian: > [!WORD] or > [!word] — any casing accepted.
 --- [!NOTE]+ expanded, [!NOTE]- collapsed.
 local function normalize_github(bq)
-  if out_format == 'github-format' or out_format == 'obsidian-format' then return nil end
+  if Options.format == 'github-format' or Options.format == 'obsidian-format' then return nil end
   local first = bq.content[1]
   if not first or first.t ~= 'Para' then return nil end
   local marker = first.content[1]
@@ -305,7 +304,7 @@ end
 --- Quarto / Pandoc 3.9 / Sphinx / pandoc-md divs.
 local function normalize_div(div)
   -- Quarto: :::{.callout-*} — title and collapse already in attributes
-  if out_format ~= 'quarto-format' then
+  if Options.format ~= 'quarto-format' then
     local kind = div.classes[1] and div.classes[1]:match('^callout%-(.+)$')
     if kind then
       div.classes = { kind }
@@ -313,10 +312,10 @@ local function normalize_div(div)
     end
   end
   -- Pandoc 3.9 / Sphinx / pandoc-md: :::{.note} — title from attribute or .title child
-  if out_format ~= 'sphinx-format' and out_format ~= 'pandoc-format'
-     and out_format ~= 'pandoc-md' then
+  if Options.format ~= 'sphinx-format' and Options.format ~= 'pandoc-format'
+     and Options.format ~= 'pandoc-md' then
     local kind = div.classes[1]
-    if kind and CalloutTypes[kind] then
+    if kind and Options.types[kind] then
       local title    = div.attributes.title or nil
       local collapse_str = div.attributes.collapse
       local collapse = collapse_str == 'true' and true or nil
@@ -342,10 +341,10 @@ local function process_metadata(meta)
 
   if not cfg then
     -- auto-detect
-    out_format = quarto ~= nil and 'quarto-format' or 'pandoc-format'
+    Options.format = quarto ~= nil and 'quarto-format' or 'pandoc-format'
   elseif type(cfg) == 'string' then
     -- alerts-normalize: pandoc-format
-    out_format = cfg
+    Options.format = cfg
   else
     -- alerts-normalize:
     --   out-format: pandoc-format
@@ -353,7 +352,7 @@ local function process_metadata(meta)
     --     - spoiler
     --     - info: note
     local fmt = cfg['out-format']
-    out_format = fmt and pandoc.utils.stringify(fmt)
+    Options.format = fmt and pandoc.utils.stringify(fmt)
                       or (quarto ~= nil and 'quarto-format' or 'pandoc-format')
     local types = cfg['custom-types']
     if types then
@@ -361,18 +360,18 @@ local function process_metadata(meta)
         if type(v) == 'table' then
           -- mapping form: { info: note }
           for src, dst in pairs(v) do
-            CalloutTypes[src] = true
-            TypeMap[src] = pandoc.utils.stringify(dst)
+            Options.types[src] = true
+            Options.type_map[src] = pandoc.utils.stringify(dst)
           end
         else
           -- plain string: spoiler
-          CalloutTypes[pandoc.utils.stringify(v)] = true
+          Options.types[pandoc.utils.stringify(v)] = true
         end
       end
     end
   end
 
-  write_rules = FormatDefaults[out_format] or FormatDefaults['pandoc-format']
+  Options.rules = FormatDefaults[Options.format] or FormatDefaults['pandoc-format']
 end
 
 return {
