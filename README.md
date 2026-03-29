@@ -259,9 +259,9 @@ Test cases cover: basic alerts, empty alert, multi-paragraph alert, rich content
 (lists, code, tables), plain blockquote passthrough, inline title, collapse markers,
 custom types, Pandoc 3.9 source divs, and Quarto source divs.
 
-## Issues and contributing
+## Examples
 
-Issues and PRs welcome at the [project repository](https://github.com/plbarrio/alerts-normalize).
+The `examples/` directory contains a full demo covering all alert types, syntax variants, and source formats. Run `make html` for a Pandoc render or `make html-quarto` for native Quarto output.
 
 ## License
 
