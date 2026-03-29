@@ -1,0 +1,64 @@
+/* Estilos para todos los tipos */
+.note, .tip, .important, .warning, .caution {
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-radius: .375rem;
+    border-left: 5px solid;
+    border-right: 1px solid rgba(210, 215, 220, 0.5);
+    border-top: 1px solid rgba(210, 215, 220, 0.5);
+    border-bottom: 1px solid rgba(210, 215, 220, 0.5);
+    background-color: white;
+}
+
+.note .title, .tip .title, .important .title, .warning .title, .caution .title {
+    font-weight: 600;
+    font-size: .9rem;
+    padding: .4em .7em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.note .title::before, .tip .title::before, .important .title::before, .warning .title::before, .caution .title::before {
+    content: "";
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+}
+
+.note p, .tip p, .important p, .warning p, .caution p {
+    margin: 0;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.9rem;
+}
+
+.note .title p, .tip .title p, .important .title p, .warning .title p, .caution .title p {
+    padding: 0;
+}
+
+/* NOTE (Azul) */
+.note { border-left-color: #0969da; }
+.note .title { color: #0969da; background-color: #f6f8fa; }
+.note .title::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%230969da'%3E%3Cpath d='M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1 0-1.5h.25V8.5h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z'%3E%3C/path%3E%3C/svg%3E"); }
+
+/* TIP (Verde) */
+.tip { border-left-color: #1f883d; }
+.tip .title { color: #1f883d; background-color: #f0fdf4; }
+.tip .title::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%231f883d'%3E%3Cpath d='M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.489a.75.75 0 0 1-1.484.21c-.04-.282-.163-.547-.362-.834a4.34 4.34 0 0 0-.622-.78l-.214-.253c-.563-.665-1.313-1.55-1.313-3.239C2.5 2.11 5.066 0 8 0s5.5 2.11 5.5 5.25c0 1.69-.75 2.574-1.313 3.238l-.214.253c-.244.289-.472.559-.622.781-.199.287-.322.552-.362.834a.75.75 0 0 1-1.484-.21c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848l.214-.253c.56-.679.984-1.32.984-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM7.5 15h1a.75.75 0 0 1 0 1.5h-1a.75.75 0 0 1 0-1.5Z'%3E%3C/path%3E%3C/svg%3E"); }
+
+/* IMPORTANT (Púrpura) */
+.important { border-left-color: #8250df; }
+.important .title { color: #8250df; background-color: #fbefff; }
+.important .title::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%238250df'%3E%3Cpath d='M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1 0-1.5h.25V8.5h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z'%3E%3C/path%3E%3C/svg%3E"); }
+
+/* WARNING (Amarillo) */
+.warning { border-left-color: #9a6700; }
+.warning .title { color: #9a6700; background-color: #fff8eb; }
+.warning .title::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%239a6700'%3E%3Cpath d='M6.457 1.047c.659-1.232 2.427-1.232 3.086 0l6.03 11.27c.642 1.2-.229 2.683-1.543 2.683H1.97c-1.314 0-2.185-1.483-1.543-2.683l6.03-11.27ZM8 5a.75.75 0 0 0-.75.75v3.5a.75.75 0 0 0 1.5 0v-3.5A.75.75 0 0 0 8 5Zm0 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z'%3E%3C/path%3E%3C/svg%3E"); }
+
+/* CAUTION (Rojo) */
+.caution { border-left-color: #d1242f; }
+.caution .title { color: #d1242f; background-color: #fff1f0; }
+.caution .title::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23d1242f'%3E%3Cpath d='M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z'%3E%3C/path%3E%3C/svg%3E"); }

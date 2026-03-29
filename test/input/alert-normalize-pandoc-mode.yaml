@@ -1,2 +1,2 @@
 alerts-normalize:
-  pandoc-format: true
+  out-format: pandoc-format

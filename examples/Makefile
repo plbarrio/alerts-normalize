@@ -1,37 +1,60 @@
-# Quarto example — alerts-normalize.lua
-#
-# Quarto auto-detected in all formats — native callout-* output throughout.
-# Filter declared in _quarto.yml as ../alerts-normalize.lua
-#
-# Run from the examples/ directory: make html
+# --- Configuration -----------------------------------------
+FILTERS       = --lua-filter=../alerts-normalize.lua
+INPUTS        = $(filter-out README.md, $(wildcard *.md))
+OUTDIR        = output/pandoc
+QOUTDIR       = output/quarto
 
-INPUTS  = $(wildcard *.md)
-OUTDIR  = output
+# Target lists (Filenames only)
+HTMLS        = $(INPUTS:.md=.html)
+EPUBS        = $(INPUTS:.md=.epub)
+PDFS_LATEX   = $(INPUTS:.md=-latex.pdf)
+PDFS_TYPST   = $(INPUTS:.md=-typst.pdf)
 
-.PHONY: all pdf-latex pdf-context pdf-typst html epub clean
+.PHONY: all pandoc quarto html epub \
+        pdf-latex-quarto pdf-typst-quarto html-quarto epub-quarto \
+        clean
 
-all: html epub
-	-$(MAKE) pdf-latex
-	-$(MAKE) pdf-context
-	-$(MAKE) pdf-typst
+all: pandoc quarto
 
-html:
-	quarto render $(INPUTS) --to html --output-dir=$(OUTDIR)
+# --- Grouped targets ---------------------------------------
+pandoc: html epub
 
-epub:
-	quarto render $(INPUTS) --to epub --output-dir=$(OUTDIR)
+quarto: html-quarto epub-quarto
+	-$(MAKE) pdf-latex-quarto
+	-$(MAKE) pdf-typst-quarto
 
-pdf-latex:
-	quarto render $(INPUTS) --to pdf --pdf-engine=lualatex \
-	  --output-dir=$(OUTDIR) --output demo-latex.pdf
+# --- Target mapping -----------
+html:              $(addprefix $(OUTDIR)/,$(HTMLS))
+epub:              $(addprefix $(OUTDIR)/,$(EPUBS))
 
-pdf-context:
-	quarto render $(INPUTS) --to pdf --pdf-engine=context \
-	  --output-dir=$(OUTDIR) --output demo-context.pdf
+html-quarto:       $(addprefix $(QOUTDIR)/,$(HTMLS))
+epub-quarto:       $(addprefix $(QOUTDIR)/,$(EPUBS))
+pdf-latex-quarto:  $(addprefix $(QOUTDIR)/,$(PDFS_LATEX))
+pdf-typst-quarto:  $(addprefix $(QOUTDIR)/,$(PDFS_TYPST))
 
-pdf-typst:
-	quarto render $(INPUTS) --to typst \
-	  --output-dir=$(OUTDIR) --output demo-typst.pdf
+$(OUTDIR) $(QOUTDIR):
+	mkdir -p $@
+
+# --- Pandoc rules ------------
+$(OUTDIR)/%.html: %.md | $(OUTDIR)
+	-pandoc $(FILTERS) --standalone --embed-resources --css=./demo.css -o $@ $<
+
+$(OUTDIR)/%.epub: %.md | $(OUTDIR)
+	-pandoc $(FILTERS) --css=./demo.css -o $@ $<
+
+# --- Quarto rules  ------------
+$(QOUTDIR)/%-latex.pdf: %.md | $(QOUTDIR)
+	-quarto render $< --to pdf --pdf-engine=lualatex --output-dir=$(QOUTDIR) --output $(notdir $@)
+
+$(QOUTDIR)/%-typst.pdf: %.md | $(QOUTDIR)
+	-quarto render $< --to typst --output-dir=$(QOUTDIR) --output $(notdir $@)
+
+$(QOUTDIR)/%.html: %.md | $(QOUTDIR)
+	-quarto render $< --to html --output-dir=$(QOUTDIR)
+
+$(QOUTDIR)/%.epub: %.md | $(QOUTDIR)
+	-quarto render $< --to epub --output-dir=$(QOUTDIR)
 
 clean:
-	rm -rf $(OUTDIR)
+	rm -rf output
+
